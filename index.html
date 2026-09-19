@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set Blox — Loja Roblox</title>
+<style>
+:root{--bg:#0b1020;--card:#151d35;--card2:#1c2745;--text:#f5f7ff;--muted:#aab5d6;--primary:#6c63ff;--accent:#20e3b2;--danger:#ff5f6d}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#090d1a,#111a35);color:var(--text)}
+header{padding:22px 6%;display:flex;justify-content:space-between;align-items:center;gap:15px;border-bottom:1px solid #283453;position:sticky;top:0;background:#0b1020ee;backdrop-filter:blur(12px);z-index:5}
+.logo{font-size:27px;font-weight:900}.logo span{color:var(--accent)}
+button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;background:var(--primary);color:white}button:hover{filter:brightness(1.12)}button.secondary{background:#2b385b}button.danger{background:var(--danger)}
+main{padding:45px 6%;max-width:1250px;margin:auto}.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:25px;align-items:center;margin-bottom:35px}.hero h1{font-size:clamp(36px,6vw,68px);margin:0 0 15px}.hero p{color:var(--muted);font-size:18px;line-height:1.5}.hero-box{background:linear-gradient(145deg,#252d69,#182d45);padding:35px;border-radius:25px;text-align:center;box-shadow:0 15px 45px #0004}.hero-box strong{font-size:60px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:20px}.card{background:var(--card);border:1px solid #2a3656;border-radius:17px;padding:18px}.product-image{height:130px;border-radius:12px;background:linear-gradient(135deg,#343d85,#203c58);display:grid;place-items:center;font-size:50px;margin-bottom:15px}.card h3{margin:5px 0}.price{font-size:22px;font-weight:900;color:var(--accent);margin:12px 0}.muted{color:var(--muted);font-size:14px}.admin,.cart,.pix{margin-top:28px;background:var(--card);border:1px solid #2a3656;border-radius:18px;padding:22px}.admin{display:none}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.admin input,.admin textarea,.admin select{width:100%;padding:12px;border-radius:9px;border:1px solid #3b496d;background:#0e162a;color:white;margin:6px 0 12px}.cart-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #303b5b}.total{font-size:24px;font-weight:900;margin-top:15px}.pix-code{background:#0d1528;padding:14px;border-radius:10px;word-break:break-all;margin:10px 0}.notice{color:#ffd166;font-size:13px;line-height:1.5}footer{text-align:center;color:var(--muted);padding:35px}
+@media(max-width:750px){.hero{grid-template-columns:1fr}header{padding:18px 4%}main{padding:30px 4%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">SET <span>BLOX</span></div>
+  <div>
+    <button class="secondary" onclick="toggleAdmin()">Modo ADM</button>
+    <button onclick="scrollToCart()">🛒 Carrinho (<span id="cartCount">0</span>)</button>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div>
+    <p class="muted">LOJA OFICIAL</p>
+    <h1>Seu universo Roblox começa aqui.</h1>
+    <p>Na Set Blox você encontra contas, itens e produtos para melhorar sua experiência no Roblox. Escolha seus produtos, adicione ao carrinho e confira seu pedido.</p>
+    <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Ver produtos</button>
+  </div>
+  <div class="hero-box"><strong>🎮</strong><h2>SET BLOX</h2><p>Produtos, praticidade e diversão.</p></div>
+</section>
+
+<section>
+<div class="toolbar"><h2>Produtos disponíveis</h2><span class="muted">Escolha o que deseja comprar</span></div>
+<div id="products" class="products"></div>
+</section>
+
+<section class="admin" id="adminPanel">
+<h2>🔐 Painel administrativo</h2><p class="notice">Senha do ADM configurada. Essa proteção é local e não é uma segurança online.</p>
+<p class="notice">Este painel é local e serve para editar a loja neste navegador. Para uma loja real com segurança, pagamentos e acesso de administrador em vários dispositivos, será necessário um backend.</p>
+<div class="admin-grid">
+<div><label>Nome do produto</label><input id="pName" placeholder="Ex.: Conta Roblox"></div>
+<div><label>Preço (R$)</label><input id="pPrice" type="number" min="0" step="0.01" placeholder="19.90"></div>
+<div><label>Emoji/imagem</label><input id="pIcon" placeholder="🎮"></div><div><label>Foto do produto (URL)</label><input id="pImage" placeholder="https://..."></div><div><label>Estoque</label><input id="pStock" type="number" min="0" value="1"></div>
+<div><label>Descrição</label><input id="pDesc" placeholder="Descrição do produto"></div>
+</div>
+<button onclick="addProduct()">Adicionar produto</button>
+<p class="notice">🛒 <b>Como será sua loja</b><br>• Fotos personalizadas: informe a URL da imagem do produto.<br>• Painel ADM: adicionar, editar e excluir produtos, preços, descrições, fotos e estoque.<br>• Cupons de desconto: criar códigos, definir desconto, validade, limite de usos e ativar/desativar.<br>• Estoque: adicionar ao carrinho não reduz o estoque; ele só deve ser reduzido quando o dono confirmar a compra ou retirar a unidade manualmente.<br>• Checkout com Gmail: o cliente informa o e-mail para receber o produto após a confirmação.<br>• Pix automático e entrega por e-mail: exigem provedor de pagamento, banco de dados e serviço de envio. O GitHub Pages sozinho não faz isso com segurança.</p>
+<hr style="border-color:#303b5b;margin:22px 0"><h3>Cupons de desconto</h3><div class="admin-grid"><div><label>Código</label><input id="couponCode" placeholder="BLOX10"></div><div><label>Desconto (%)</label><input id="couponDiscount" type="number" min="1" max="100" value="10"></div><div><label>Validade</label><input id="couponExpiry" type="date"></div><div><label>Limite de usos</label><input id="couponLimit" type="number" min="1" value="10"></div></div><button onclick="saveCoupon()">Salvar cupom</button><div id="couponList" class="muted"></div>
+<button class="secondary" onclick="clearProducts()">Restaurar produtos padrão</button>
+<hr style="border-color:#303b5b;margin:22px 0">
+<label>Chave Pix</label><input id="pixInput" placeholder="Digite sua chave Pix">
+<button onclick="savePix()">Salvar chave Pix</button>
+<hr style="border-color:#303b5b;margin:22px 0"><h3>Pedidos e Gmail dos clientes</h3><p class="notice">Somente quem entrar no Modo ADM verá esta lista neste navegador. Entrega somente depois de marcar o pagamento como confirmado.</p><div id="adminOrders"><p class="muted">Nenhum pedido registrado.</p></div><hr style="border-color:#303b5b;margin:22px 0"><h3>Gerenciar produtos</h3><div id="adminProducts"><p class="muted">Nenhum produto cadastrado.</p></div>
+</section>
+
+<section class="cart" id="cart">
+<h2>🛒 Seu carrinho</h2>
+<div id="cartItems"><p class="muted">Seu carrinho está vazio.</p></div>
+<div class="total">Total: R$ <span id="cartTotal">0,00</span></div>
+<label for="customerEmail">Seu Gmail (para receber o produto após o pagamento)</label><input id="customerEmail" type="email" placeholder="seunome@gmail.com" required style="width:100%;padding:12px;border-radius:9px;border:1px solid #3b496d;background:#0e162a;color:white;margin:6px 0 12px"><label for="customerCoupon">Cupom de desconto (opcional)</label><input id="customerCoupon" type="text" placeholder="Digite seu cupom" style="width:100%;padding:12px;border-radius:9px;border:1px solid #3b496d;background:#0e162a;color:white;margin:6px 0 12px"><button onclick="checkout()">Finalizar pedido</button>
+<button class="secondary" onclick="clearCart()">Limpar carrinho</button>
+<p class="notice">Adicionar ao carrinho não retira estoque. O estoque deve ser baixado somente após a confirmação da compra pelo dono; a confirmação automática do Pix exige uma integração de pagamento.</p>
+</section>
+
+<section class="pix">
+<h2>💚 Pagamento via Pix</h2>
+<p>Copie a chave Pix abaixo para realizar o pagamento:</p>
+<div class="pix-code" id="pixDisplay">Sua chave Pix aparecerá aqui.</div>
+<button onclick="copyPix()">📋 Copiar chave Pix</button>
+<p id="copyStatus" class="muted"></p>
+</section>
+</main>
+<footer>© 2026 Set Blox — Loja Roblox</footer>
+
+<script>
+const defaultProducts=[
+{id:1,name:"Conta Roblox",price:29.90,icon:"🎮",desc:"Conta Roblox com detalhes do produto."},
+{id:2,name:"Item especial",price:14.90,icon:"⭐",desc:"Item para sua experiência no Roblox."},
+{id:3,name:"Produto premium",price:49.90,icon:"💎",desc:"Produto premium da Set Blox."}
+];
+let products=JSON.parse(localStorage.getItem("setblox_products")||"null")||defaultProducts;
+let cart=JSON.parse(localStorage.getItem("setblox_cart")||"[]");
+let pix=localStorage.getItem("setblox_pix")||"COLOQUE_SUA_CHAVE_PIX_AQUI";
+let coupons=JSON.parse(localStorage.getItem("setblox_coupons")||"[]");
+let reservations=JSON.parse(localStorage.getItem("setblox_reservations")||"[]");
+let orders=JSON.parse(localStorage.getItem("setblox_orders")||"[]");
+const ADMIN_PASSWORD="ketlyn2011";
+
+function money(v){return v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function renderProducts(){
+ const el=document.getElementById("products");el.innerHTML="";
+ products.forEach(p=>{el.innerHTML+=`<div class="card"><div class="product-image">${escapeHtml(p.icon||"🎮")}</div><h3>${escapeHtml(p.name)}</h3><p class="muted">${escapeHtml(p.desc||"")}</p><div class="price">R$ ${money(p.price)}</div><p class="muted">Estoque: ${Number(p.stock??0)}</p><button ${Number(p.stock??0)<=0?"disabled":""} onclick="addCart(${p.id})">Adicionar ao carrinho</button></div>`});
+ renderAdminProducts();
+ renderAdminOrders();
+}
+function renderAdminProducts(){
+ const el=document.getElementById("adminProducts");if(!el)return;
+ if(!products.length){el.innerHTML='<p class="muted">Nenhum produto cadastrado.</p>';return;}
+ el.innerHTML=products.map(p=>`<div class="cart-row"><span><b>${escapeHtml(p.name)}</b><br><span class="muted">R$ ${money(p.price)}</span></span><span><button class="secondary" onclick="editProduct(${p.id})">Editar</button> <button class="danger" onclick="deleteProduct(${p.id})">Excluir</button></span></div>`).join("");
+}
+function renderCart(){
+ const el=document.getElementById("cartItems");let total=0;
+ if(!cart.length)el.innerHTML='<p class="muted">Seu carrinho está vazio.</p>';
+ else{el.innerHTML=cart.map((item,i)=>{total+=item.price*item.qty;return `<div class="cart-row"><span>${escapeHtml(item.name)} x${item.qty}</span><span>R$ ${money(item.price*item.qty)} <button class="danger" onclick="removeCart(${i})">×</button></span></div>`}).join("")}
+ document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.qty,0);
+ document.getElementById("cartTotal").textContent=money(total);
+ localStorage.setItem("setblox_cart",JSON.stringify(cart));
+}
+function addCart(id){const p=products.find(x=>x.id===id);if(!p)return;if(Number(p.stock??0)<=0)return alert("Produto sem estoque.");const existing=cart.find(x=>x.id===id);if(existing)existing.qty++;else cart.push({...p,qty:1});renderCart();alert("Produto adicionado ao carrinho!")}
+function removeCart(i){cart.splice(i,1);renderCart()}
+function clearCart(){cart=[];renderCart()}
+function scrollToCart(){document.getElementById("cart").scrollIntoView({behavior:"smooth"})}
+function toggleAdmin(){
+ const panel=document.getElementById("adminPanel");
+ if(panel.style.display==="block"){panel.style.display="none";return;}
+ const password=prompt("Digite a senha do administrador:");
+ if(password!==ADMIN_PASSWORD){alert("Senha incorreta.");return;}
+ panel.style.display="block";
+ document.getElementById("pixInput").value=pix;
+ renderAdminProducts();
+}
+function addProduct(){const name=document.getElementById("pName").value.trim(),price=Number(document.getElementById("pPrice").value),icon=document.getElementById("pIcon").value||"🎮",image=document.getElementById("pImage").value.trim(),stock=Number(document.getElementById("pStock").value||0),desc=document.getElementById("pDesc").value.trim();if(!name||Number.isNaN(price)||price<0)return alert("Preencha nome e preço.");products.push({id:Date.now(),name,price,icon,image,stock,desc});localStorage.setItem("setblox_products",JSON.stringify(products));renderProducts();alert("Produto adicionado!")}
+function clearProducts(){
+ if(!confirm("Restaurar os produtos padrão?"))return;
+ products=defaultProducts.map(p=>({...p}));
+ localStorage.setItem("setblox_products",JSON.stringify(products));
+ renderProducts();
+}
+function editProduct(id){
+ const p=products.find(x=>x.id===id);if(!p)return;
+ const name=prompt("Nome do produto:",p.name);if(name===null)return;
+ const priceText=prompt("Preço em reais:",p.price);if(priceText===null)return;
+ const price=Number(priceText);
+ if(!name.trim()||Number.isNaN(price)||price<0){alert("Nome ou preço inválido.");return;}
+ const desc=prompt("Descrição:",p.desc||"");if(desc===null)return;
+ const icon=prompt("Emoji do produto:",p.icon||"🎮");if(icon===null)return;
+ const image=prompt("URL da foto:",p.image||"");if(image===null)return;
+ const stockText=prompt("Estoque atual:",p.stock??0);if(stockText===null)return;
+ const stock=Number(stockText);
+ if(!Number.isFinite(stock)||stock<0){alert("Estoque inválido.");return;}
+ Object.assign(p,{name:name.trim(),price,desc,icon,image,stock});
+ localStorage.setItem("setblox_products",JSON.stringify(products));
+ renderProducts();alert("Produto atualizado!");
+}
+function deleteProduct(id){
+ const p=products.find(x=>x.id===id);if(!p)return;
+ if(!confirm("Excluir o produto "+p.name+"?"))return;
+ products=products.filter(x=>x.id!==id);
+ localStorage.setItem("setblox_products",JSON.stringify(products));
+ renderProducts();
+}
+function renderAdminOrders(){
+ const el=document.getElementById("adminOrders");if(!el)return;
+ if(!orders.length){el.innerHTML='<p class="muted">Nenhum pedido registrado.</p>';return;}
+ el.innerHTML=orders.map((o,i)=>`<div class="card" style="margin:10px 0"><b>Pedido #${escapeHtml(o.id)}</b><p class="muted">Gmail: ${escapeHtml(o.email)}<br>Data: ${escapeHtml(o.date)}<br>Itens: ${escapeHtml(o.items)}<br>Total: R$ ${escapeHtml(o.total)}</p><p>Status: <b>${o.paid?"Pagamento confirmado":"Aguardando pagamento"}</b> — ${o.delivered?"Entregue":"Não entregue"}</p><button onclick="confirmOrder(${i})">${o.paid?"Pagamento confirmado":"Confirmar pagamento"}</button> <button class="secondary" onclick="markDelivered(${i})" ${!o.paid?"disabled":""}>Marcar como entregue</button> <button class="danger" onclick="deleteOrder(${i})">Excluir</button></div>`).join("");
+}
+function confirmOrder(i){const o=orders[i];if(!o)return;if(!confirm("Confirmar pagamento deste pedido? O estoque será reduzido agora."))return;for(const item of o.itemsData){const p=products.find(x=>x.id===item.id);if(!p||Number(p.stock??0)<item.qty)return alert("Estoque insuficiente para confirmar este pedido.");}for(const item of o.itemsData){const p=products.find(x=>x.id===item.id);p.stock=Number(p.stock??0)-item.qty;}o.paid=true;if(o.couponCode){const c=coupons.find(c=>c.code===o.couponCode);if(c)c.used++;localStorage.setItem("setblox_coupons",JSON.stringify(coupons));}localStorage.setItem("setblox_orders",JSON.stringify(orders));localStorage.setItem("setblox_products",JSON.stringify(products));renderProducts();renderAdminOrders();renderCoupons();alert("Pagamento confirmado e estoque atualizado. Agora você pode enviar o produto ao Gmail do cliente.");}
+function markDelivered(i){if(!orders[i]||!orders[i].paid)return alert("Confirme o pagamento primeiro.");orders[i].delivered=true;localStorage.setItem("setblox_orders",JSON.stringify(orders));renderAdminOrders();alert("Pedido marcado como entregue.");}
+function deleteOrder(i){if(!confirm("Excluir este pedido?"))return;orders.splice(i,1);localStorage.setItem("setblox_orders",JSON.stringify(orders));renderAdminOrders();}
+function savePix(){pix=document.getElementById("pixInput").value.trim();localStorage.setItem("setblox_pix",pix);renderPix();alert("Chave Pix salva neste navegador.")}
+function renderPix(){document.getElementById("pixDisplay").textContent=pix}
+function copyPix(){navigator.clipboard?.writeText(pix).then(()=>document.getElementById("copyStatus").textContent="Chave Pix copiada!").catch(()=>document.getElementById("copyStatus").textContent="Copie a chave manualmente.")}
+function checkout(){
+ if(!cart.length)return alert("Adicione produtos ao carrinho primeiro.");
+ const email=document.getElementById("customerEmail").value.trim();
+ if(!/^[^\s@]+@gmail\.com$/i.test(email))return alert("Digite um Gmail válido, terminando com @gmail.com.");
+ const code=(document.getElementById("customerCoupon")?.value||"").trim().toUpperCase();
+ let coupon=null;
+ if(code){
+  coupon=coupons.find(c=>c.code===code && c.active && c.used<c.limit && c.expiry>=new Date().toISOString().slice(0,10));
+  if(!coupon)return alert("Cupom inválido, expirado, desativado ou sem usos disponíveis.");
+ }
+ const items=cart.map(x=>`${x.name} x${x.qty}`).join(", ");
+ const baseTotal=cart.reduce((sum,x)=>sum+Number(x.price)*x.qty,0);
+ const finalTotal=coupon?baseTotal*(1-coupon.discount/100):baseTotal;
+ const total=finalTotal.toFixed(2).replace('.',',');
+ const order={id:String(Date.now()).slice(-8),email,date:new Date().toLocaleString("pt-BR"),items,itemsData:cart.map(x=>({id:x.id,qty:x.qty})),total,baseTotal, couponCode:coupon?.code||"", couponDiscount:coupon?.discount||0,paid:false,delivered:false};
+ orders.push(order);localStorage.setItem("setblox_orders",JSON.stringify(orders));
+ alert(`Pedido registrado!\n\nItens: ${items}\nTotal: R$ ${total}${coupon?`\nCupom: ${coupon.code} (-${coupon.discount}%)`:""}\nGmail: ${email}\nPix: ${pix}\n\nA entrega será feita somente após a confirmação do pagamento pelo dono da loja.`);
+ cart=[];renderCart();document.getElementById("customerEmail").value="";if(document.getElementById("customerCoupon"))document.getElementById("customerCoupon").value="";
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+renderProducts();renderCart();renderPix();renderCoupons();
+</script>
+</body>
+</html>
+<script>
+function saveCoupon(){const code=document.getElementById("couponCode").value.trim().toUpperCase();const discount=Number(document.getElementById("couponDiscount").value);const expiry=document.getElementById("couponExpiry").value;const limit=Number(document.getElementById("couponLimit").value);if(!code||discount<=0||discount>100||!expiry||limit<=0)return alert("Preencha os dados do cupom.");coupons.push({code,discount,expiry,limit,used:0,active:true});localStorage.setItem("setblox_coupons",JSON.stringify(coupons));renderCoupons();alert("Cupom salvo localmente.")}
+function renderCoupons(){const el=document.getElementById("couponList");if(!el)return;el.innerHTML=coupons.length?coupons.map((c,i)=>`<div class="cart-row"><span><b>${escapeHtml(c.code)}</b> — ${c.discount}% até ${c.expiry} — ${c.used}/${c.limit} usos — ${c.active?"Ativo":"Inativo"}</span><button class="secondary" onclick="coupons[${i}].active=!coupons[${i}].active;localStorage.setItem('setblox_coupons',JSON.stringify(coupons));renderCoupons()">Ativar/desativar</button></div>`).join(""):"Nenhum cupom criado."}
+</script>
