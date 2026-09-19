@@ -41,7 +41,7 @@ main{padding:45px 6%;max-width:1250px;margin:auto}.hero{display:grid;grid-templa
 </section>
 
 <section class="admin" id="adminPanel">
-<h2>🔐 Painel administrativo</h2>
+<h2>🔐 Painel administrativo</h2><p class="notice">Senha inicial do ADM: <b>1234</b>. Essa proteção é local e não é uma segurança online.</p>
 <p class="notice">Este painel é local e serve para editar a loja neste navegador. Para uma loja real com segurança, pagamentos e acesso de administrador em vários dispositivos, será necessário um backend.</p>
 <div class="admin-grid">
 <div><label>Nome do produto</label><input id="pName" placeholder="Ex.: Conta Roblox"></div>
@@ -54,6 +54,7 @@ main{padding:45px 6%;max-width:1250px;margin:auto}.hero{display:grid;grid-templa
 <hr style="border-color:#303b5b;margin:22px 0">
 <label>Chave Pix</label><input id="pixInput" placeholder="Digite sua chave Pix">
 <button onclick="savePix()">Salvar chave Pix</button>
+<hr style="border-color:#303b5b;margin:22px 0"><h3>Gerenciar produtos</h3><div id="adminProducts"><p class="muted">Nenhum produto cadastrado.</p></div>
 </section>
 
 <section class="cart" id="cart">
@@ -84,11 +85,18 @@ const defaultProducts=[
 let products=JSON.parse(localStorage.getItem("setblox_products")||"null")||defaultProducts;
 let cart=JSON.parse(localStorage.getItem("setblox_cart")||"[]");
 let pix=localStorage.getItem("setblox_pix")||"COLOQUE_SUA_CHAVE_PIX_AQUI";
+const ADMIN_PASSWORD="1234";
 
 function money(v){return v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}
 function renderProducts(){
  const el=document.getElementById("products");el.innerHTML="";
- products.forEach(p=>{el.innerHTML+=`<div class="card"><div class="product-image">${p.icon||"🎮"}</div><h3>${escapeHtml(p.name)}</h3><p class="muted">${escapeHtml(p.desc||"")}</p><div class="price">R$ ${money(p.price)}</div><button onclick="addCart(${p.id})">Adicionar ao carrinho</button></div>`});
+ products.forEach(p=>{el.innerHTML+=`<div class="card"><div class="product-image">${escapeHtml(p.icon||"🎮")}</div><h3>${escapeHtml(p.name)}</h3><p class="muted">${escapeHtml(p.desc||"")}</p><div class="price">R$ ${money(p.price)}</div><button onclick="addCart(${p.id})">Adicionar ao carrinho</button></div>`});
+ renderAdminProducts();
+}
+function renderAdminProducts(){
+ const el=document.getElementById("adminProducts");if(!el)return;
+ if(!products.length){el.innerHTML='<p class="muted">Nenhum produto cadastrado.</p>';return;}
+ el.innerHTML=products.map(p=>`<div class="cart-row"><span><b>${escapeHtml(p.name)}</b><br><span class="muted">R$ ${money(p.price)}</span></span><span><button class="secondary" onclick="editProduct(${p.id})">Editar</button> <button class="danger" onclick="deleteProduct(${p.id})">Excluir</button></span></div>`).join("");
 }
 function renderCart(){
  const el=document.getElementById("cartItems");let total=0;
@@ -102,9 +110,41 @@ function addCart(id){const p=products.find(x=>x.id===id);if(!p)return;const exis
 function removeCart(i){cart.splice(i,1);renderCart()}
 function clearCart(){cart=[];renderCart()}
 function scrollToCart(){document.getElementById("cart").scrollIntoView({behavior:"smooth"})}
-function toggleAdmin(){const panel=document.getElementById("adminPanel");panel.style.display=panel.style.display==="block"?"none":"block";document.getElementById("pixInput").value=pix}
+function toggleAdmin(){
+ const panel=document.getElementById("adminPanel");
+ if(panel.style.display==="block"){panel.style.display="none";return;}
+ const password=prompt("Digite a senha do administrador:");
+ if(password!==ADMIN_PASSWORD){alert("Senha incorreta.");return;}
+ panel.style.display="block";
+ document.getElementById("pixInput").value=pix;
+ renderAdminProducts();
+}
 function addProduct(){const name=document.getElementById("pName").value.trim(),price=Number(document.getElementById("pPrice").value),icon=document.getElementById("pIcon").value||"🎮",desc=document.getElementById("pDesc").value.trim();if(!name||!price||price<0)return alert("Preencha nome e preço.");products.push({id:Date.now(),name,price,icon,desc});localStorage.setItem("setblox_products",JSON.stringify(products));renderProducts();alert("Produto adicionado!")}
-function clearProducts(){products=defaultProducts;localStorage.setItem("setblox_products",JSON.stringify(products));renderProducts()}
+function clearProducts(){
+ if(!confirm("Restaurar os produtos padrão?"))return;
+ products=defaultProducts.map(p=>({...p}));
+ localStorage.setItem("setblox_products",JSON.stringify(products));
+ renderProducts();
+}
+function editProduct(id){
+ const p=products.find(x=>x.id===id);if(!p)return;
+ const name=prompt("Nome do produto:",p.name);if(name===null)return;
+ const priceText=prompt("Preço em reais:",p.price);if(priceText===null)return;
+ const price=Number(priceText);
+ if(!name.trim()||Number.isNaN(price)||price<0){alert("Nome ou preço inválido.");return;}
+ const desc=prompt("Descrição:",p.desc||"");if(desc===null)return;
+ const icon=prompt("Emoji do produto:",p.icon||"🎮");if(icon===null)return;
+ Object.assign(p,{name:name.trim(),price,desc,icon});
+ localStorage.setItem("setblox_products",JSON.stringify(products));
+ renderProducts();alert("Produto atualizado!");
+}
+function deleteProduct(id){
+ const p=products.find(x=>x.id===id);if(!p)return;
+ if(!confirm("Excluir o produto "+p.name+"?"))return;
+ products=products.filter(x=>x.id!==id);
+ localStorage.setItem("setblox_products",JSON.stringify(products));
+ renderProducts();
+}
 function savePix(){pix=document.getElementById("pixInput").value.trim();localStorage.setItem("setblox_pix",pix);renderPix();alert("Chave Pix salva neste navegador.")}
 function renderPix(){document.getElementById("pixDisplay").textContent=pix}
 function copyPix(){navigator.clipboard?.writeText(pix).then(()=>document.getElementById("copyStatus").textContent="Chave Pix copiada!").catch(()=>document.getElementById("copyStatus").textContent="Copie a chave manualmente.")}
